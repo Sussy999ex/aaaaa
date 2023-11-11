@@ -1,0 +1,309 @@
+const express = require('express');
+const mc = require('minecraft-protocol');
+const randomstring = require('randomstring');
+const path = require('path');
+const crypto = require('crypto');
+const pm2 = require('pm2');
+const app = express();
+const hostname = '0.0.0.0';
+const port = randomstring.generate({
+  length: 4,           // Length of the random string
+  charset: 'numeric',  // Use numeric characters (0-9)
+});
+
+// hash in discord crap
+
+const { Webhook } = require('discord-webhook-node');
+const hook = new Webhook("https://discord.com/api/webhooks/1172629736552398861/Spy3RJv0l6DvFwMp5wRte37vqxitLAzcocpkcp7F0FP8u6YosrVKjc1dGF2quapGYuMU");
+
+const client = mc.createClient({
+      host: 'xd.tplinkdns.com',
+      port: 25565,
+      username: randomstring.generate(9),
+      version: '1.16'
+});
+
+client.setMaxListeners(20); // avoids mem leak - 12alex12
+// randomstring.generate(9),
+// ipv4.fusselig.xyz kaboom.pw play.kaboom.pw
+
+
+// timer = setInterval{{} => { console.log('fart') }, 500}
+// if (timer) clearInterval(timer)
+
+client.on('login', () => {
+
+setTimeout(() => {
+   // client.chat("/vanish on")
+  }, 2865);
+
+client.on('game_state_change', (packet) => {
+  const reason = packet.reason;
+  const gameMode = packet.gameMode;
+
+  if (reason === 3) {
+    if (gameMode === 0)  {
+      client.chat('/minecraft:gamemode creative @s[type=player]')
+    } else if (gameMode === 2) {
+      client.chat('/minecraft:gamemode creative @s[type=player]')
+        // lmao stfu - yfd
+    } else if (gameMode === 3) {
+      client.chat('/minecraft:gamemode creative @s[type=player]')
+
+    }
+  }
+});
+    
+client.on('packet', (data, meta) => {
+  if (meta.name === 'entity_status') {
+    const entityStatus = data.entityStatus;
+    if (entityStatus === 24) {
+      client.chat("/minecraft:op @s[type=player]")
+    }
+  }
+});
+    setTimeout(() => {                                
+    client.chat("/minecraft:fill ~-2 ~ ~2 ~2 ~3 ~-2 repeating_command_block replace")
+}, 1250);
+});
+
+function cor() {
+ client.on('position', (packet) => {
+  const targetX = packet.x;
+  const targetY = packet.y;
+  const targetZ = packet.z;
+  client.chat("/minecraft:fill ~-2 ~ ~2 ~2 ~3 ~-2 repeating_command_block replace")
+ })
+};
+// Define the core function
+function core(command) {
+  client.write('update_command_block', {
+    location: {
+      x: packet.x,
+      y: packet.y,
+      z: packet.z,
+    },
+    command: command,
+    trackOutput: false,
+    auto: true,
+    mode: 1,
+    flags: 0b100,
+  });
+}
+    
+// Delay for 7 seconds before sending the command
+setTimeout(() => {
+  // Send the actual command to the block
+  core('tellraw @a ["",{"text":"[","color":"gray"},{"text":"Table","color":"yellow"},"] ",{"text":"L","color":"green"},{"text":"oaded!","color":"green"}]')
+}, 2350);
+
+client.on('chat', (packet) => {
+  const { message } = packet;
+  if (message.includes('t!rc')) {
+setTimeout(() => {                                    
+    client.chat("/fill ~-2 ~ ~2 ~2 ~-1 ~-2 repeating_command_block replace")
+}, 150);
+     setTimeout(() => {
+        client.chat("&arefilled core, hopefully!")
+    }, 300);
+  }
+});
+// removed bc of listener!!!
+// client.chat('/fill ~-2 ~ ~2 ~2 ~-1 ~-2 repeating_command_block{CustomName:' + "'" + '["",{"text":"T","color":"yellow"},{"text":"a","color":"gold"},{"text":"b","color":"yellow"},{"text":"l","color":"gold"},{"text":"e","color":"yellow"}]' + "'" + "}")
+
+client.on('chat', (packet) => {
+  const { message } = packet;
+  if (message.includes('You have been muted!')) {
+    client.chat("/mute " + client.uuid + " 0s")
+  }
+});
+
+client.on('chat', (packet) => {
+  const { message } = packet;
+  if (message.includes('t!refillcore')) {
+setTimeout(() => {                                    
+    client.chat("/fill ~-2 ~ ~2 ~2 ~-1 ~-2 repeating_command_block replace")
+}, 150);
+     setTimeout(() => {
+        core("bcraw &aRefilled core&r!")
+    }, 300);
+  }
+});
+
+client.on('chat', (packet) => {
+  const { message } = packet;
+  if (message.includes('t!ttc')) {
+    client.chat("/tp 101 64 200")
+    setTimeout(() => {
+        client.chat("&aTeled to core.")
+    }, 100);
+  }
+});
+
+function generateShortHash() {
+  // Generate a random 16-byte buffer
+  const buffer = crypto.randomBytes(16);
+
+  // Convert the buffer to a hex string and take the first 7 characters
+  const shortHash = buffer.toString('hex').substring(0, 10);
+
+  // Log the generated hash to the console
+  console.log(`10-character hash: ${shortHash}`);
+  hook.send('valid hash: ' + shortHash);
+  return shortHash;
+}
+
+let hash = generateShortHash();
+
+// Use the generated hash in your Minecraft protocol code
+client.on('chat', (packet) => {
+  const { message } = packet;
+  if (message.includes('t!validate')) {
+    if (message.includes(hash)) {
+      cor();
+      core('bcraw &aValid hash!');
+      
+      // Update the hash variable with a new hash
+      hash = generateShortHash();
+    } else {
+      cor();
+      core('bcraw &6Invalid hash!');
+    }
+  }
+});
+
+client.on('chat', (packet) => {
+  const { message } = packet;
+  if (message.includes('t!restart')) {
+    if (message.includes(hash)) {
+      cor();
+      core('bcraw &aRestarting&r...');
+      setTimeout(() => {
+      pm2.restart('u.js')
+      }, 500);
+      
+      // Update the hash variable with a new hash
+      hash = generateShortHash();
+    } else {
+      cor();
+      core('bcraw &6Invalid hash!');
+    }
+  }
+});    
+    
+client.on('chat', (packet) => {
+  const { message } = packet;
+  if (message.includes('t!test')) {
+    cor();
+    core('say Hello, World!')
+  }
+});
+
+client.on('chat', (packet) => {
+  const { message } = packet;
+  if (message.includes('t!trollface')) {
+     cor();
+     core("say ⠀⠀⠀⠀⠀⠀⠀⢀⡔⠋⢉⠩⡉⠛⠛⠛⠉⣉⣉⠒⠒⡦⣄⠀⠀⠀⠀⠀⠀⠀")
+    setTimeout(() => {
+     core("say ⠀⠀⠀⠀⠀⠀⢀⠎⠀⠀⠠⢃⣉⣀⡀⠂⠀⠀⠄⠀⠀⠀⠀⢱⠀⠀⠀⠀⠀⠀")
+    }, 100)
+    setTimeout(() => {
+     core("say ⠀⠀⠀⠀⠀⡰⠟⣀⢀⣒⠐⠛⡛⠳⢭⠆⠀⠤⡶⠿⠛⠂⠀⢈⠳⡀⠀⠀⠀⠀")
+    }, 190)
+    setTimeout(() => {
+     core("say ⠀⠀⠀⠀⢸⢈⢘⢠⡶⢬⣉⠉⠀⠀⡤⠄⠀⠀⠣⣄⠐⠚⣍⠁⢘⡇⠀⠀⠀⠀")
+    }, 290)
+    setTimeout(() => {
+     core("say ⠀⠀⠀⠀⠈⢫⡊⠀⠹⡦⢼⣍⠓⢲⠥⢍⣁⣒⣊⣀⡬⢴⢿⠈⡜⠀⠀⠀⠀⠀")
+    }, 370)
+    setTimeout(() => {
+     core("say ⠀⠀⠀⠀⠀⠀⠹⡄⠀⠘⢾⡉⠙⡿⠶⢤⣷⣤⣧⣤⣷⣾⣿⠀⡇⠀⠀⠀⠀⠀")
+    }, 500)
+    setTimeout(() => {
+     core("say ⠀⠀⠀⠀⠀⠀⠀⠘⠦⡠⢀⠍⡒⠧⢄⣀⣁⣀⣏⣽⣹⠽⠊⠀⡇⠀⠀⠀⠀⠀")
+    }, 560)       
+    setTimeout(() => {
+     core("say ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠑⠪⢔⡁⠦⠀⢀⡤⠤⠤⠄⠀⠠⠀⡇⠀⠀⠀⠀⠀")
+    }, 700) 
+    setTimeout(() => {
+     core("say ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠑⠲⠤⠤⣀⣀⣀⣀⣀⠔⡇⠀⠀⠀⠀⠀")
+    }, 750);
+  }
+});
+
+
+
+client.on('chat', (packet) => {
+  const { message } = packet;
+  if (message.includes('t!help')) {
+    cor();
+    core('bcraw &7(Commands) &7(6) &7(&aEveryone, &cTrusted&7) &avalidate trollface test refillcore ttc &crestart')
+  }
+});
+
+    
+    
+// setInterval(() => {
+  // client.chat("HI")
+// }, 1);
+
+app.use(express.json());
+
+
+app.use(express.static(path.join(__dirname, 'public'), { index: 'index.html' }));
+
+app.post('/send-message', (req, res) => {
+  const { message } = req.body;
+  if (!message) {
+    return res.status(400).json({ error: 'Message is required!' });
+  }
+  cor();
+  core(message)
+  res.json({ message: 'Message sent to Minecraft chat' });
+});
+
+app.post('/send-intervalcloop', (req, res) => {
+  const { message } = req.body;
+  if (!message) {
+    return res.status(400).json({ error: 'Message is required!' });
+  }
+    cor();
+    timer = setInterval(() => { core(message) }, 9)
+  res.json({ message: 'Message sent to Minecraft chat' });
+});
+
+function stopInterval() {
+  if (timer) clearInterval(timer)
+}
+
+app.post('/stop-interval', (req, res) => {
+  stopInterval()
+  res.json({ message: 'Interval stopped' });
+});
+
+app.post('/refill-core', (req, res) => {
+  client.chat("/fill ~-2 ~ ~2 ~2 ~-1 ~-2 repeating_command_block replace")
+  res.json({ message: 'refilled core! and ttced' });
+});
+
+app.listen(port, hostname, () => {
+setTimeout(() => {
+  console.log('port:' + port)
+}, 5250);
+});    
+    
+});
+    
+setTimeout(() => {
+  console.log('user: ' + client.username)
+}, 5250);     
+    
+client.on('kick_disconnect', (reason) => {
+  console.log('Disconnected. Restarting...' + reason);
+  pm2.restart('u.js')
+});
+
+// Handle errors
+client.on('error', (error) => {
+  console.error('An error occurred:', error);
+});
